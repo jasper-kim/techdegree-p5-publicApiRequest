@@ -47,7 +47,7 @@ function displayModal(data) {
             const employee = employees.filter(employee => {
                 return employee.name.first === employeeName.toLocaleLowerCase();
             });
-            console.log(employee);
+            
             const modalHTML = `
                 <div class="modal-container">
                     <div class="modal">
@@ -73,6 +73,8 @@ function displayModal(data) {
             `;
 
             galleryDiv.innerHTML += modalHTML;
+
+            closeModal();
         });
     });
 }
@@ -83,6 +85,15 @@ function formatBday(text) {
     return text.replace(regex, '$2/$3/$1');
 }
 
+//Closes modal pop up
+function closeModal() {
+    const closeBtn = document.getElementById('modal-close-btn');
+
+    closeBtn.addEventListener('click', (e) => {
+        const modalDiv = document.querySelector('.modal-container');
+        modalDiv.remove();
+    });
+}
 
 getEmployees(url)
     .then(data => displayEmployees(data))

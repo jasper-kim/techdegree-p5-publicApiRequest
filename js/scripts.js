@@ -1,9 +1,9 @@
-//Constant variables
+// Constant variables
 const url = "https://randomuser.me/api/?results=12&nat=us";
 const galleryDiv = document.getElementById('gallery');
 const employees = [];
 
-//Handle fetch requests
+// Generates async funtion to make fetch requests
 async function getJSON(url) {
     try{
         const response = await fetch(url);
@@ -18,7 +18,7 @@ async function getEmployees(url) {
     return employeesJSON.results;     
 }
 
-// Generate the markup for each employee
+// Makes markup for each employee
 function displayEmployees(data) {
     data.map(employee => {
         const employeeHTML = `
@@ -39,7 +39,7 @@ function displayEmployees(data) {
     })
 }
 
-// Generate the modal for each employee
+// Makes markup for employee
 function displayModal(data) {
     data.map(item => {
         item.addEventListener('click', (e) => {
@@ -71,7 +71,7 @@ function displayModal(data) {
                     </div>
                 </div>
             `;
-
+            
             galleryDiv.innerHTML += modalHTML;
 
             closeModal();
@@ -85,14 +85,18 @@ function formatBday(text) {
     return text.replace(regex, '$2/$3/$1');
 }
 
-//Closes modal pop up
+//Closes modal window
 function closeModal() {
     const closeBtn = document.getElementById('modal-close-btn');
+    const cardDivs = document.querySelectorAll('.card');
+    const cardArray = [...cardDivs];
 
     closeBtn.addEventListener('click', (e) => {
         const modalDiv = document.querySelector('.modal-container');
         modalDiv.remove();
     });
+
+    displayModal(cardArray);
 }
 
 getEmployees(url)

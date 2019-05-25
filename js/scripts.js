@@ -20,6 +20,18 @@ async function getEmployees(url) {
 }
 
 //Makes markup for search
+function searchEmployee(list, input) {
+    const text = input.value;
+
+    list.map(item => {
+        if(item.querySelector('#name').textContent.includes(text)) {
+            item.style.display = "";
+        }else {
+            item.style.display = "none";
+        }
+    });
+}
+
 function generateSearch() {
     const searDiv = `
         <form action="#" method="get">
@@ -36,27 +48,11 @@ function generateSearch() {
     const cardArray = [...cardDivs];
 
     searchBtn.addEventListener('click', () => {
-        cardArray.map(card => {
-            if(searchInput.value === card.querySelector('#name').textContent) {
-                card.style.display = "";
-            } else if(searchInput.value === "") {
-                card.style.display = "";
-            }else {
-                card.style.display = "none";
-            }
-        });
+        searchEmployee(cardArray, searchInput);
     });
 
     searchInput.addEventListener('input', () => {
-        cardArray.map(card => {
-            if(searchInput.value === card.querySelector('#name').textContent) {
-                card.style.display = "";
-            } else if(searchInput.value === "") {
-                card.style.display = "";
-            }else {
-                card.style.display = "none";
-            }
-        });
+        searchEmployee(cardArray, searchInput);
     })
 }
 
@@ -75,12 +71,15 @@ function displayEmployees(data) {
                 </div>
             </div>
         `;
+        
         galleryDiv.innerHTML += employeeHTML;
         employees.push(employee);
     })
 
     const cardDivs = document.querySelectorAll('.card');
     const cardArray = [...cardDivs];
+
+    
     displayModal(cardArray);
 
     generateSearch();

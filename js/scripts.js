@@ -2,7 +2,7 @@
 const url = "https://randomuser.me/api/?results=12&nat=us";
 const galleryDiv = document.getElementById('gallery');
 const searchContainerDiv = document.querySelector('.search-container');
-const employees = [];
+const modals = [];
 
 // Generates async funtion to make fetch requests
 async function getJSON(url) {
@@ -58,71 +58,60 @@ function generateSearch() {
 
 // Makes markup for each employee
 function displayEmployees(data) {
-    data.map(employee => {
+    data.forEach((employee, index) => {
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+
         const employeeHTML = `
-            <div class="card">
-                <div class="card-img-container">
-                    <img class="card-img" src="${employee.picture.large}" alt="profile picture">
-                </div>
-                <div class="card-info-container">
-                    <h3 id="name" class="card-name cap">${employee.name.first}</h3>
-                    <p class="card-text">${employee.email}</p>
-                    <p class="card-text cap">${employee.location.city}, ${employee.location.state}</p>
-                </div>
+            <div class="card-img-container">
+                <img class="card-img" src="${employee.picture.large}" alt="profile picture">
+            </div>
+            <div class="card-info-container">
+                <h3 id="name" class="card-name cap">${employee.name.first}</h3>
+                <p class="card-text">${employee.email}</p>
+                <p class="card-text cap">${employee.location.city}, ${employee.location.state}</p>
             </div>
         `;
-        
-        galleryDiv.innerHTML += employeeHTML;
-        employees.push(employee);
-    })
 
-    const cardDivs = document.querySelectorAll('.card');
-    const cardArray = [...cardDivs];
+        cardDiv.innerHTML = employeeHTML;
+        galleryDiv.appendChild(cardDiv);
 
-    
-    displayModal(cardArray);
+        //------------------------------------------------
+        //Modal generate
+
+        const modalDiv = document.createElement('div');
+        modalDiv.className = 'modal-container';
+
+        const modalHTML = `
+            <div class="modal">
+                <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
+                <div class="modal-info-container">
+                    <img class="modal-img" src="${employee.picture.large}" alt="profile picture">
+                    <h3 id="name" class="modal-name cap">${employee.name.first}</h3>
+                    <p class="modal-text">${employee.email}</p>
+                    <p class="modal-text cap">${employee.location.city}, ${employee.location.state}</p>
+                    <hr>
+                    <p class="modal-text">${employee.phone}</p>
+                    <p class="modal-text">${employee.location.street}, ${employee.location.city}, ${employee.location.state}, ${employee.location.postcode}</p>
+                    <p class="modal-text">Birthday: ${formatBday(employee.dob.date)}</p>
+                </div>
+            </div>
+            <div class="modal-btn-container">
+                <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
+                <button type="button" id="modal-next" class="modal-next btn">Next</button>
+            </div>
+        `;
+
+        modalDiv.innerHTML = modalHTML;
+        modals.push(modalDiv);
+
+        cardDiv.addEventListener('click', () => {
+            galleryDiv.appendChild(modals[index]);
+            controlModal(index);
+        });
+    });    
 
     generateSearch();
-}
-
-// Makes markup for employee
-function displayModal(data) {
-    data.map(item => {
-        item.addEventListener('click', (e) => {
-            const employeeName = item.querySelector('#name').textContent;
-            const employee = employees.filter(employee => {
-                return employee.name.first === employeeName.toLocaleLowerCase();
-            });
-            
-            const modalHTML = `
-                <div class="modal-container">
-                    <div class="modal">
-                        <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
-                        <div class="modal-info-container">
-                            <img class="modal-img" src="${employee[0].picture.large}" alt="profile picture">
-                            <h3 id="name" class="modal-name cap">${employee[0].name.first}</h3>
-                            <p class="modal-text">${employee[0].email}</p>
-                            <p class="modal-text cap">${employee[0].location.city}, ${employee[0].location.state}</p>
-                            <hr>
-                            <p class="modal-text">${employee[0].phone}</p>
-                            <p class="modal-text">${employee[0].location.street}, ${employee[0].location.city}, ${employee[0].location.state}, ${employee[0].location.postcode}</p>
-                            <p class="modal-text">Birthday: ${formatBday(employee[0].dob.date)}</p>
-                        </div>
-                    </div>
-
-                    // IMPORTANT: Below is only for exceeds tasks 
-                    <div class="modal-btn-container">
-                        <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
-                        <button type="button" id="modal-next" class="modal-next btn">Next</button>
-                    </div>
-                </div>
-            `;
-            
-            galleryDiv.innerHTML += modalHTML;
-
-            closeModal();
-        });
-    });
 }
 
 //Reformats bitrh day
@@ -132,17 +121,31 @@ function formatBday(text) {
 }
 
 //Closes modal window
-function closeModal() {
+function controlModal(index) {
     const closeBtn = document.getElementById('modal-close-btn');
-    const cardDivs = document.querySelectorAll('.card');
-    const cardArray = [...cardDivs];
+    const prevBtn = document.getElementById('modal-prev');
+    const nextBtn = document.getElementById('modal-next');
+    const modalDiv = document.querySelector('.modal-container');
 
-    closeBtn.addEventListener('click', (e) => {
-        const modalDiv = document.querySelector('.modal-container');
-        modalDiv.remove();
+    closeBtn.addEventListener('click', () => {
+       modalDiv.remove();
     });
 
-    displayModal(cardArray);
+    prevBtn.addEventListener('click', () => {
+        modalDiv.remove();
+        if(index > 0) {
+            galleryDiv.appendChild(modals[index-1]);
+            controlModal(index-1);
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        modalDiv.remove();
+        if(index < 11) {
+            galleryDiv.appendChild(modals[index+1]);
+            controlModal(index+1);
+        }
+    });
 }
 
 getEmployees(url)
@@ -151,4 +154,3 @@ getEmployees(url)
         galleryDiv.innerHTML = "<h3>Somthing went wrong!</h3>";
         console.error(e);
     });
-

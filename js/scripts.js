@@ -1,6 +1,7 @@
 // Constant variables
 const url = "https://randomuser.me/api/?results=12&nat=us";
 const galleryDiv = document.getElementById('gallery');
+const searchContainerDiv = document.querySelector('.search-container');
 const employees = [];
 
 // Generates async funtion to make fetch requests
@@ -18,25 +19,71 @@ async function getEmployees(url) {
     return employeesJSON.results;     
 }
 
+//Makes markup for search
+function generateSearch() {
+    const searDiv = `
+        <form action="#" method="get">
+        <input type="search" id="search-input" class="search-input" placeholder="Search...">
+        <input type="submit" value="&#x1F50D;" id="serach-submit" class="search-submit">
+        </form>
+        `;
+
+    searchContainerDiv.innerHTML = searDiv;
+
+    const searchInput = document.getElementById('search-input');
+    const searchBtn = document.getElementById('serach-submit');
+    const cardDivs = document.querySelectorAll('.card');
+    const cardArray = [...cardDivs];
+
+    searchBtn.addEventListener('click', () => {
+        cardArray.map(card => {
+            if(searchInput.value === card.querySelector('#name').textContent) {
+                card.style.display = "";
+            } else if(searchInput.value === "") {
+                card.style.display = "";
+            }else {
+                card.style.display = "none";
+            }
+        });
+    });
+
+    searchInput.addEventListener('input', () => {
+        cardArray.map(card => {
+            if(searchInput.value === card.querySelector('#name').textContent) {
+                card.style.display = "";
+            } else if(searchInput.value === "") {
+                card.style.display = "";
+            }else {
+                card.style.display = "none";
+            }
+        });
+    })
+}
+
 // Makes markup for each employee
 function displayEmployees(data) {
     data.map(employee => {
         const employeeHTML = `
             <div class="card">
-            <div class="card-img-container">
-                <img class="card-img" src="${employee.picture.large}" alt="profile picture">
-            </div>
-            <div class="card-info-container">
-                <h3 id="name" class="card-name cap">${employee.name.first}</h3>
-                <p class="card-text">${employee.email}</p>
-                <p class="card-text cap">${employee.location.city}, ${employee.location.state}</p>
-            </div>
+                <div class="card-img-container">
+                    <img class="card-img" src="${employee.picture.large}" alt="profile picture">
+                </div>
+                <div class="card-info-container">
+                    <h3 id="name" class="card-name cap">${employee.name.first}</h3>
+                    <p class="card-text">${employee.email}</p>
+                    <p class="card-text cap">${employee.location.city}, ${employee.location.state}</p>
+                </div>
             </div>
         `;
-
         galleryDiv.innerHTML += employeeHTML;
         employees.push(employee);
     })
+
+    const cardDivs = document.querySelectorAll('.card');
+    const cardArray = [...cardDivs];
+    displayModal(cardArray);
+
+    generateSearch();
 }
 
 // Makes markup for employee
@@ -60,7 +107,7 @@ function displayModal(data) {
                             <hr>
                             <p class="modal-text">${employee[0].phone}</p>
                             <p class="modal-text">${employee[0].location.street}, ${employee[0].location.city}, ${employee[0].location.state}, ${employee[0].location.postcode}</p>
-                            <p class="modal-text">${formatBday(employee[0].dob.date)}</p>
+                            <p class="modal-text">Birthday: ${formatBday(employee[0].dob.date)}</p>
                         </div>
                     </div>
 
@@ -104,9 +151,5 @@ getEmployees(url)
     .catch( e => {
         galleryDiv.innerHTML = "<h3>Somthing went wrong!</h3>";
         console.error(e);
-    })
-    .finally(() => {
-        const cardDivs = document.querySelectorAll('.card');
-        const cardArray = [...cardDivs];
-        displayModal(cardArray);
     });
+

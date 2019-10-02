@@ -40,12 +40,12 @@ async function getEmployees(url) {
  * @param {object} input - object of html input element
  */
 function searchEmployee(list, input) {
-    const text = input.value;
+const text = input.value.toLowerCase();
     
     //Loop through employee element
     list.map(item => {
         //Check if the element has the input value in its name.
-        if(item.querySelector('#name').textContent.includes(text)) {
+        if(item.querySelector('#name').textContent.toLowerCase().includes(text)) {
             item.style.display = "";
         }else {
             item.style.display = "none";
